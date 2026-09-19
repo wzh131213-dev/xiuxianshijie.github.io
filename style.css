@@ -57,7 +57,7 @@ button, canvas, input {
 .three-container {
     position: relative;
     width: 75%;
-    height: 100px;
+    height: 50xp;
     border-radius: 0.75rem;
     overflow: hidden;
     background: radial-gradient(circle at center, #1c1917 0%, #0c0a09 100%);
