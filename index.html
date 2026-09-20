@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>修仙寻道：3D仙途漫漫</title>
-    <!-- Tailwind CSS -->
+    <title>修仙寻道：3D仙途</title>
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Three.js 3D Library -->
+    <!-- Three.js 3D Engine CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Custom CSS -->
+    
+    <!-- 引入独立的外部样式表 -->
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="h-screen w-screen flex flex-col bg-stone-950 text-stone-200 overflow-hidden">
+<body class="min-h-screen w-screen flex flex-col bg-stone-950 text-stone-200">
 
     <header class="bg-stone-900/95 border-b border-amber-900/40 relative z-40 px-3 py-1.5 shadow-md backdrop-blur-md shrink-0">
         <div class="max-w-4xl mx-auto flex justify-between items-center gap-2">
@@ -24,13 +26,13 @@
                 <div>
                     <h1 class="text-sm font-bold text-amber-200 tracking-wider flex items-center gap-1">
                         <span>修仙寻道</span>
-                        <span class="text-[8px] bg-amber-950 text-amber-400 px-1 py-0.2 rounded border border-amber-700/50">3D</span>
+                        <span class="text-[8px] bg-amber-950 text-amber-400 px-1 py-0.2 rounded border border-amber-700/50">3D分册版</span>
                     </h1>
                     <div class="text-[10px] text-amber-400/80">境界: <span id="realm-title" class="font-bold text-amber-300">凡人期</span></div>
                 </div>
             </div>
 
-            <!-- Currency & Global Stats Compact -->
+            <!-- Global Currency & Save Controls -->
             <div class="flex items-center gap-1.5 text-xs">
                 <div class="bg-stone-950/90 px-2 py-0.5 rounded-lg border border-amber-900/40 flex items-center gap-1 shadow-inner">
                     <span class="text-amber-400 text-xs">💎</span>
@@ -40,7 +42,6 @@
                     <span class="text-emerald-400 text-xs">⚡</span>
                     <span id="global-rate" class="font-bold text-emerald-300">1/s</span>
                 </div>
-                <!-- Save & Reset Controls -->
                 <button onclick="downloadSaveFile()" class="w-7 h-7 bg-amber-950/80 hover:bg-amber-800 text-amber-200 rounded-lg border border-amber-700/50 flex items-center justify-center text-[10px] transition active:scale-95 shadow" title="导出存档">
                     <i class="fa-solid fa-download"></i>
                 </button>
@@ -55,21 +56,26 @@
         </div>
     </header>
 
-    <main id="main-container" class="max-w-4xl mx-auto w-full p-2.5 flex-1 grid grid-cols-1 md:grid-cols-3 gap-3 overflow-hidden">
+    <main id="main-container" class="max-w-4xl mx-auto w-full p-2.5 flex-1 grid grid-cols-1 md:grid-cols-3 gap-3 pb-16">
         
-        <!-- Left 2 Columns: Tab Content Views -->
-        <div class="md:col-span-2 flex flex-col h-full overflow-hidden">
+        <div class="md:col-span-2 flex flex-col gap-3">
             
             <!-- TAB 1: CULTIVATION -->
-            <div id="view-cultivate" class="tab-view flex flex-col gap-2.5 h-full overflow-y-auto pr-0.5">
-                
-                <!-- 3D View Container -->
+            <div id="view-cultivate" class="tab-view flex flex-col gap-2.5">
+                <!-- 3D Cave Canvas Box -->
                 <div class="bg-stone-900/90 border border-amber-900/50 rounded-xl p-2 backdrop-blur-md relative shadow-lg shrink-0">
                     <div class="flex justify-between items-center px-1 mb-1">
                         <span class="text-[11px] text-amber-300/80 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-cube"></i> 3D 洞府仙境 <span class="text-[9px] text-stone-400 font-normal">(拖动旋转)</span>
+                            <i class="fa-solid fa-cube"></i> 3D 洞府仙境 <span class="text-[9px] text-stone-400 font-normal">(拖动旋转视角)</span>
                         </span>
-                        <span id="3d-sword-count" class="text-[10px] text-amber-400 bg-amber-950/60 px-1.5 py-0.2 rounded border border-amber-800/40">御剑: 1</span>
+                        <div class="flex items-center gap-2">
+                            <div class="flex bg-stone-950/80 rounded border border-amber-900/40 text-[9px] overflow-hidden">
+                                <button onclick="setCameraMode('overhead')" id="cam-mode-overhead" class="px-2 py-0.5 text-stone-400 hover:text-amber-200 transition">俯瞰</button>
+                                <button onclick="setCameraMode('third')" id="cam-mode-third" class="px-2 py-0.5 bg-amber-900/60 text-amber-200 font-bold transition">第三视角</button>
+                                <button onclick="setCameraMode('first')" id="cam-mode-first" class="px-2 py-0.5 text-stone-400 hover:text-amber-200 transition">第一视角</button>
+                            </div>
+                            <span id="3d-sword-count" class="text-[10px] text-amber-400 bg-amber-950/60 px-1.5 py-0.2 rounded border border-amber-800/40">御剑: 1</span>
+                        </div>
                     </div>
                     <div class="three-container flex items-center justify-center">
                         <canvas id="three-canvas"></canvas>
@@ -80,14 +86,12 @@
                     </div>
                 </div>
 
-                <!-- Xiuwei Progress Panel -->
                 <div class="bg-stone-900/80 border border-amber-900/40 rounded-xl p-3 text-center relative backdrop-blur-md shadow-md shrink-0">
                     <div class="text-[11px] text-stone-400">单一天地修为</div>
                     <div class="text-2xl font-extrabold text-amber-300 my-0.5 font-serif tracking-wider">
                         <span id="xiuwei-val">0</span> / <span id="xiuwei-max">100</span>
                     </div>
 
-                    <!-- Xiuwei Bar -->
                     <div class="w-full bg-stone-950 h-2.5 rounded-full overflow-hidden p-0.5 border border-stone-800 my-1.5 relative">
                         <div id="xiuwei-bar" class="bg-gradient-to-r from-amber-700 via-amber-500 to-yellow-400 h-full rounded-full transition-all duration-300 w-0"></div>
                     </div>
@@ -97,25 +101,21 @@
                         <span>突破成功率: <span id="breakthrough-rate" class="text-emerald-400 font-bold">100%</span></span>
                     </div>
 
-                    <!-- Action Buttons -->
                     <div class="flex gap-2 justify-center">
                         <button id="tap-meditate-btn" onclick="manualMeditate(event)" class="flex-1 py-1.5 bg-gradient-to-r from-amber-800 to-amber-900 hover:from-amber-700 hover:to-amber-800 text-amber-100 font-bold text-xs rounded-lg border border-amber-500/30 shadow transition active:scale-95 flex items-center justify-center gap-1.5">
                             <span class="text-sm">🧘</span> 吐纳聚气 (+1)
                         </button>
-                        <button id="btn-breakthrough" onclick="attemptBreakthrough()" class="flex-1 py-1.5 bg-gradient-to-r from-yellow-700 to-amber-600 hover:from-yellow-600 hover:to-amber-500 text-stone-950 font-extrabold text-xs rounded-lg border border-yellow-400/50 shadow transition active:scale-95 disabled:opacity-50">
+                        <button id="btn-breakthrough" onclick="attemptBreakthrough()" class="flex-1 py-1.5 bg-gradient-to-r from-yellow-700 to-amber-600 hover:from-yellow-600 hover:to-amber-500 text-stone-950 font-extrabold text-xs rounded-lg border border-yellow-400/50 shadow transition active:scale-95">
                             尝试突破境界
                         </button>
                     </div>
                 </div>
 
-                <!-- Realm Preview List Compact -->
                 <div class="bg-stone-900/60 border border-amber-900/30 rounded-xl p-3 shrink-0">
                     <h3 class="text-xs font-bold text-amber-300 mb-2 flex items-center gap-1">
                         <span>✨</span> 修仙境界阶梯
                     </h3>
-                    <div id="realms-list" class="grid grid-cols-3 gap-1.5 text-[10px]">
-                        <!-- Injected by JS -->
-                    </div>
+                    <div id="realms-list" class="grid grid-cols-3 gap-1.5 text-[10px] max-h-40 overflow-y-auto pr-1"></div>
                 </div>
             </div>
 
@@ -129,7 +129,6 @@
                     <p class="text-xs text-stone-400 max-w-sm mx-auto mb-3">
                         需突破至 <span class="text-amber-400 font-bold">筑基期</span> 方可破界游走，寻找上古宝典。
                     </p>
-                    <div class="text-[10px] text-amber-500/70">提示：在洞府修炼积累修为以突破筑基期</div>
                 </div>
 
                 <div id="wander-unlocked-card" class="hidden flex flex-col gap-2.5">
@@ -148,27 +147,19 @@
 
                         <div id="wander-encounter-card" class="bg-stone-950/80 border border-amber-800/30 rounded-lg p-2.5 flex items-center justify-between gap-3">
                             <div class="flex items-center gap-2.5">
-                                <div id="wander-encounter-icon" class="w-9 h-9 rounded-lg bg-amber-950/60 border border-amber-700/40 flex items-center justify-center text-lg shrink-0">
-                                    📜
-                                </div>
+                                <div id="wander-encounter-icon" class="w-9 h-9 rounded-lg bg-amber-950/60 border border-amber-700/40 flex items-center justify-center text-lg shrink-0">📜</div>
                                 <div>
                                     <div id="wander-encounter-title" class="text-xs font-bold text-amber-200">静心准备，蓄势待发</div>
                                     <div id="wander-encounter-desc" class="text-[10px] text-stone-400">点击“游走”前往秘境寻觅大机缘</div>
                                 </div>
                             </div>
-                            <div id="wander-encounter-tag" class="text-[10px] px-2 py-0.5 rounded bg-stone-800 text-stone-400 border border-stone-700 shrink-0">
-                                未起程
-                            </div>
+                            <div id="wander-encounter-tag" class="text-[10px] px-2 py-0.5 rounded bg-stone-800 text-stone-400 border border-stone-700 shrink-0">未起程</div>
                         </div>
                     </div>
 
                     <div class="bg-stone-900/80 border border-amber-900/40 rounded-xl p-3">
-                        <h4 class="text-xs font-bold text-amber-300 mb-2 flex items-center gap-1">
-                            <span>✨</span> 仙游可参悟宝典一览
-                        </h4>
-                        <div id="wander-manuals-preview" class="grid grid-cols-2 gap-2 text-xs">
-                            <!-- Injected by JS -->
-                        </div>
+                        <h4 class="text-xs font-bold text-amber-300 mb-2 flex items-center gap-1"><span>✨</span> 仙游可参悟宝典</h4>
+                        <div id="wander-manuals-preview" class="grid grid-cols-2 gap-2 text-xs"></div>
                     </div>
                 </div>
             </div>
@@ -178,10 +169,8 @@
                 <div class="bg-stone-900/80 border border-amber-900/40 rounded-xl p-3 backdrop-blur-md">
                     <div class="flex justify-between items-center border-b border-amber-900/30 pb-2 mb-2">
                         <div>
-                            <h3 class="text-sm font-bold text-amber-300 flex items-center gap-1">
-                                <span>📚</span> 藏经阁
-                            </h3>
-                            <p class="text-[10px] text-stone-400">游走领悟的绝世功法宝典，提供永久属性加成</p>
+                            <h3 class="text-sm font-bold text-amber-300 flex items-center gap-1"><span>📚</span> 藏经阁</h3>
+                            <p class="text-[10px] text-stone-400">领悟绝世功法宝典，提供永久加成</p>
                         </div>
                         <div class="text-right">
                             <div class="text-[10px] text-stone-400">已领悟</div>
@@ -190,9 +179,7 @@
                     </div>
 
                     <div class="bg-amber-950/30 border border-amber-800/40 rounded-lg p-2 mb-2.5">
-                        <div class="text-[10px] font-bold text-amber-400 mb-1 flex items-center gap-1">
-                            <span>⚡</span> 功法加成汇总：
-                        </div>
+                        <div class="text-[10px] font-bold text-amber-400 mb-1 flex items-center gap-1"><span>⚡</span> 功法总加成：</div>
                         <div class="grid grid-cols-3 gap-1 text-[10px] text-stone-300">
                             <div>修炼速: <span class="text-amber-300 font-bold" id="buff-speed-text">+0%</span></div>
                             <div>攻击力: <span class="text-amber-300 font-bold" id="buff-atk-text">+0%</span></div>
@@ -200,56 +187,39 @@
                         </div>
                     </div>
 
-                    <div id="manuals-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <!-- Injected dynamically -->
-                    </div>
+                    <div id="manuals-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                 </div>
             </div>
 
             <!-- TAB 4: SHOP -->
             <div id="view-shop" class="tab-view hidden flex flex-col gap-2.5 h-full overflow-y-auto pr-0.5">
                 <div class="bg-stone-900/80 border border-amber-900/40 rounded-xl p-3 backdrop-blur-md">
-                    <h3 class="text-sm font-bold text-amber-300 mb-1 flex items-center gap-1">
-                        <span>⛩</span> 坊市多宝阁
-                    </h3>
-                    <p class="text-[10px] text-stone-400 mb-3">消耗灵石换取丹药与法宝，助你加快突破进程。</p>
-                    
-                    <div id="shop-items-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <!-- Injected by JS -->
-                    </div>
+                    <h3 class="text-sm font-bold text-amber-300 mb-1 flex items-center gap-1"><span>⛩</span> 坊市多宝阁</h3>
+                    <p class="text-[10px] text-stone-400 mb-3">消耗灵石换取丹药与法宝。</p>
+                    <div id="shop-items-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                 </div>
             </div>
 
             <!-- TAB 5: ADVENTURE -->
-            <div id="view-adventure" class="tab-view hidden flex flex-col gap-2.5 h-full overflow-y-auto pr-0.5">
+            <div id="view-adventure" class="tab-view hidden flex flex-col gap-2.5">
                 <div class="bg-stone-900/80 border border-amber-900/40 rounded-xl p-3 backdrop-blur-md">
                     <div class="flex justify-between items-center border-b border-amber-900/30 pb-2 mb-2">
                         <div>
-                            <h3 class="text-sm font-bold text-amber-300 flex items-center gap-1">
-                                <span>⚔️</span> 洞天历练
-                            </h3>
-                            <p class="text-[10px] text-stone-400">击杀小妖10只后进阶，三轮后迎战【境界BOSS】！</p>
+                            <h3 class="text-sm font-bold text-amber-300 flex items-center gap-1"><span>⚔️</span> 洞天历练</h3>
+                            <p class="text-[10px] text-stone-400">击杀小妖进阶，迎战【境界BOSS】！</p>
                         </div>
-                        <div class="text-[10px] text-stone-400">
-                            战力: <span id="player-atk-display" class="text-amber-300 font-bold">10</span>
-                        </div>
+                        <div class="text-[10px] text-stone-400">战力: <span id="player-atk-display" class="text-amber-300 font-bold">10</span></div>
                     </div>
 
                     <div id="enemy-card" class="bg-stone-950/80 border border-amber-900/30 rounded-xl p-3 text-center space-y-2 relative overflow-hidden transition-all duration-300">
                         <div class="flex items-center justify-between gap-1 px-1">
-                            <span id="enemy-wave-title" class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800/60 text-[10px] font-bold">
-                                阶段 1/3：普通小妖
-                            </span>
-                            <span id="enemy-count-badge" class="px-2 py-0.5 rounded bg-stone-900 text-amber-300 border border-stone-700 text-[10px] font-bold">
-                                进度: 0/10
-                            </span>
+                            <span id="enemy-wave-title" class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800/60 text-[10px] font-bold">阶段 1/3：普通小妖</span>
+                            <span id="enemy-count-badge" class="px-2 py-0.5 rounded bg-stone-900 text-amber-300 border border-stone-700 text-[10px] font-bold">进度: 0/10</span>
                         </div>
 
                         <div class="relative py-1">
                             <div id="monster-icon" class="text-4xl inline-block transition-transform duration-200">🐉</div>
-                            <div id="monster-boss-tag" class="hidden absolute top-0 right-1/3 bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.2 rounded shadow animate-pulse">
-                                ⚠️ BOSS
-                            </div>
+                            <div id="monster-boss-tag" class="hidden absolute top-0 right-1/3 bg-red-600 text-white text-[9px] font-extrabold px-1.5 py-0.2 rounded shadow animate-pulse">⚠️ BOSS</div>
                         </div>
 
                         <div>
@@ -281,53 +251,79 @@
 
         </div>
 
-        <!-- Right Panel: Game Logs (Compact) -->
-        <div class="flex flex-col h-[450px] overflow-hidden">
-            <div class="bg-stone-900/80 border border-amber-900/40 rounded-xl p-3 backdrop-blur-md flex flex-col h-full overflow-hidden">
+        <!-- Right Panel: Game Logs -->
+        <div class="flex flex-col">
+            <div class="bg-stone-900/80 border border-amber-900/40 rounded-xl p-3 backdrop-blur-md flex flex-col h-64 md:h-full">
                 <div class="flex justify-between items-center border-b border-amber-900/30 pb-2 mb-2 shrink-0">
-                    <h3 class="text-xs font-bold text-amber-300 flex items-center gap-1">
-                        <span>📜</span> 仙途履历
-                    </h3>
+                    <h3 class="text-xs font-bold text-amber-300 flex items-center gap-1"><span>📜</span> 仙途履历</h3>
                     <button onclick="clearLogs()" class="text-[10px] text-stone-500 hover:text-stone-300">清空</button>
                 </div>
-
-                <!-- Scrollable Log Container -->
-                <div id="game-logs" class="flex-1 overflow-y-auto space-y-1 text-[10px] font-mono pr-1">
-                    <!-- Dynamic logs here -->
-                </div>
+                <div id="game-logs" class="flex-1 overflow-y-auto space-y-1 text-[10px] font-mono pr-1 max-h-80 md:max-h-none"></div>
             </div>
         </div>
 
     </main>
 
-    <nav class="fixed bottom-20 left-4 right-4 z-50 bg-stone-900/95 border border-amber-900/60 backdrop-blur-lg shadow-2xl px-2 py-1.5 rounded-2xl">
+    <!-- Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 bg-stone-900/95 border-t border-amber-900/60 backdrop-blur-lg shadow-xl px-2 py-1.5">
         <div class="max-w-xl mx-auto flex justify-around items-center gap-1">
             <button onclick="switchTab('cultivate')" id="tab-btn-cultivate" class="tab-btn flex-1 py-1 px-1.5 flex flex-col items-center justify-center rounded-lg bg-amber-900/40 text-amber-200 border border-amber-700/50 transition active:scale-95">
-                <span class="text-sm mb-0.5">☯</span>
-                <span class="text-[10px] font-bold">洞府</span>
+                <span class="text-sm mb-0.5">☯</span><span class="text-[10px] font-bold">洞府</span>
             </button>
             <button onclick="switchTab('wander')" id="tab-btn-wander" class="tab-btn flex-1 py-1 px-1.5 flex flex-col items-center justify-center rounded-lg text-stone-400 hover:text-amber-200 transition active:scale-95 relative">
-                <span class="text-sm mb-0.5">🗺</span>
-                <span class="text-[10px] font-bold">游走</span>
+                <span class="text-sm mb-0.5">🗺</span><span class="text-[10px] font-bold">云游</span>
                 <span id="wander-lock-tag" class="absolute top-0 right-1 text-[8px] bg-red-950 text-red-400 px-1 rounded-full border border-red-800/50">筑基</span>
             </button>
             <button onclick="switchTab('manuals')" id="tab-btn-manuals" class="tab-btn flex-1 py-1 px-1.5 flex flex-col items-center justify-center rounded-lg text-stone-400 hover:text-amber-200 transition active:scale-95 relative">
-                <span class="text-sm mb-0.5">📜</span>
-                <span class="text-[10px] font-bold">藏经阁</span>
+                <span class="text-sm mb-0.5">📜</span><span class="text-[10px] font-bold">藏经阁</span>
                 <span id="manual-count-badge" class="absolute top-0 right-1 bg-amber-950 text-amber-400 text-[8px] px-1 rounded-full border border-amber-800/60">0/8</span>
             </button>
             <button onclick="switchTab('shop')" id="tab-btn-shop" class="tab-btn flex-1 py-1 px-1.5 flex flex-col items-center justify-center rounded-lg text-stone-400 hover:text-amber-200 transition active:scale-95">
-                <span class="text-sm mb-0.5">⛩</span>
-                <span class="text-[10px] font-bold">坊市</span>
+                <span class="text-sm mb-0.5">⛩</span><span class="text-[10px] font-bold">坊市</span>
             </button>
             <button onclick="switchTab('adventure')" id="tab-btn-adventure" class="tab-btn flex-1 py-1 px-1.5 flex flex-col items-center justify-center rounded-lg text-stone-400 hover:text-amber-200 transition active:scale-95">
-                <span class="text-sm mb-0.5">⚔️</span>
-                <span class="text-[10px] font-bold">历练</span>
+                <span class="text-sm mb-0.5">⚔️</span><span class="text-[10px] font-bold">历练</span>
             </button>
         </div>
     </nav>
 
-    <!-- Game Logic -->
-    <script src="script.js"></script>
+    <script>
+        // 全局扩展 20 个全新仙界境界（共 30 个境界），自动注入供 game.js 读取
+        window.CUSTOM_REALMS = [
+            { name: "凡人期", max: 100, rate: 1, breakRate: 100 },
+            { name: "炼气期", max: 300, rate: 3, breakRate: 95 },
+            { name: "筑基期", max: 800, rate: 10, breakRate: 90 },
+            { name: "金丹期", max: 2500, rate: 35, breakRate: 85 },
+            { name: "元婴期", max: 8000, rate: 120, breakRate: 80 },
+            { name: "化神期", max: 25000, rate: 400, breakRate: 75 },
+            { name: "炼虚期", max: 80000, rate: 1200, breakRate: 70 },
+            { name: "合体期", max: 250000, rate: 3500, breakRate: 65 },
+            { name: "大乘期", max: 800000, rate: 10000, breakRate: 60 },
+            { name: "渡劫期", max: 2500000, rate: 30000, breakRate: 55 },
+            // 新增 20 个更高阶修仙仙界与至高道境
+            { name: "人仙境", max: 8000000, rate: 90000, breakRate: 50 },
+            { name: "地仙境", max: 25000000, rate: 250000, breakRate: 48 },
+            { name: "天仙境", max: 80000000, rate: 700000, breakRate: 45 },
+            { name: "玄仙境", max: 250000000, rate: 2000000, breakRate: 42 },
+            { name: "金仙境", max: 800000000, rate: 6000000, breakRate: 40 },
+            { name: "太乙散仙", max: 2500000000, rate: 18000000, breakRate: 38 },
+            { name: "太乙真仙", max: 8000000000, rate: 50000000, breakRate: 35 },
+            { name: "太乙玄仙", max: 25000000000, rate: 150000000, breakRate: 32 },
+            { name: "太乙金仙", max: 80000000000, rate: 450000000, breakRate: 30 },
+            { name: "大罗散仙", max: 250000000000, rate: 1200000000, breakRate: 28 },
+            { name: "大罗金仙", max: 800000000000, rate: 3500000000, breakRate: 25 },
+            { name: "混元金仙", max: 2500000000000, rate: 10000000000, breakRate: 22 },
+            { name: "混元大罗金仙", max: 8000000000000, rate: 30000000000, breakRate: 20 },
+            { name: "半步圣人", max: 25000000000000, rate: 90000000000, breakRate: 18 },
+            { name: "混元圣人", max: 80000000000000, rate: 250000000000, breakRate: 15 },
+            { name: "天道圣人", max: 250000000000000, rate: 700000000000, breakRate: 12 },
+            { name: "大道至圣", max: 800000000000000, rate: 2000000000000, breakRate: 10 },
+            { name: "鸿蒙道祖", max: 2500000000000000, rate: 6000000000000, breakRate: 8 },
+            { name: "混沌主宰", max: 8000000000000000, rate: 18000000000000, breakRate: 5 },
+            { name: "无上道极", max: 25000000000000000, rate: 50000000000000, breakRate: 3 }
+        ];
+    </script>
+    <!-- 引入独立的外部 JS 核心逻辑代码 -->
+    <script src="game.js"></script>
 </body>
 </html>
